@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    //currently have an issue with multiple time instances
+
     //Doing this with a game object. Trying to use objects to get better practice because they still don't make sense
     //Create an object where keys are questions, and those keys hold dictionaries with the question number key,
     //which holds the value for their question, answers, correctAnswer, and whether or not they've been used yet
@@ -24,7 +26,8 @@ $(document).ready(function () {
         displayAnswer: null,
         correct: 0,
         incorrect: 0,
-        gameFinished: false,
+        unanswered: 0,
+        timer: 30,
 
         // Pull randomly from object full of questions and display that question along with its possible answers
         pullQuestion: function () {
@@ -49,17 +52,19 @@ $(document).ready(function () {
                     }
                 });
                 triviaGame.Questions[qPulled].isPulled = true;
-            } else if (triviaGame.gameFinished === true) {
-                //display a winning screen
             } else {
                 //So this kinda works. pullQuestion breaks if there are no more unpulled questions, then I could throw an exception clause that moves to the game results screen
                 //Otherwise, need to find a way for the function to set gameFinished to true if and only if it runs pullQuestion without ever entering the if statement.
                 try {
                     triviaGame.pullQuestion();
                 }
-                catch(error) {
+                catch (error) {
                     //this works. So what I will do is on the catch, go to the results screen.
-                    console.log(error);
+                    $("#question").html("All done, heres how you did!");
+                    $("#b0").html("Correct Answers: " + triviaGame.correct);
+                    $("#b1").html("Incorrect Answers: " + triviaGame.incorrect);
+                    $("#b2").html("Unanswered: " + triviaGame.unanswered).css("visibility", "visible");
+                    $("#b3").css("visibility", "hidden")
                 }
             };
         },
@@ -68,16 +73,34 @@ $(document).ready(function () {
             if (buttonPress["innerText"] === triviaGame.Questions[qPulled].correctAnswer) {
                 console.log("correct!");
                 triviaGame.correct++;
-            }else {
+            } else {
                 console.log("incorrect!")
                 triviaGame.incorrect++;
             };
         },
 
+        startTimer: function () {
+            triviaGame.timer = 30;
+            setInterval(triviaGame.decrement, 1000);
+        },
 
+        decrement: function () {
+            triviaGame.timer--;
+            $("#timer").html("Time Remaining: " + triviaGame.timer + " seconds.")
+            if (triviaGame.timer === 0) {
+                triviaGame.unanswered++;
+                triviaGame.pullQuestion();
+                clearInterval(triviaGame.decrement);
+                triviaGame.startTimer();
+            };
+        }
+
+        //also need a resetfunction, which sets all questions to unpulled, sets counters to 0, and pulls another question
 
     };
 
+    //these are just placeholders for the startgame button
+    triviaGame.startTimer();
     triviaGame.pullQuestion();
 
     //When answer is clicked
@@ -87,8 +110,9 @@ $(document).ready(function () {
         $("#b1").empty();
         $("#b2").empty();
         $("#b3").empty();
-        //setTimeout(triviaGame.pullQuestion, 3000);
-        triviaGame.pullQuestion();
+        clearInterval(triviaGame.startTimer);
+        setTimeout(triviaGame.startTimer, 3000);
+        setTimeout(triviaGame.pullQuestion, 3000);
     });
 
     //Be able to mark the question as pulled, so as to not repeat any
