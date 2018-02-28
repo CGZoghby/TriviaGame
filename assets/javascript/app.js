@@ -41,7 +41,7 @@ $(document).ready(function () {
                     $("#b" + i).html(displayAnswer[i]);
                 }
                 //This hides unused question slots
-                $(".button").each(function() {
+                $(".button").each(function () {
                     if ($(this).html().length === 0) {
                         $(this).css("visibility", "hidden")
                     } else {
@@ -54,18 +54,24 @@ $(document).ready(function () {
             } else {
                 //So this kinda works. pullQuestion breaks if there are no more unpulled questions, then I could throw an exception clause that moves to the game results screen
                 //Otherwise, need to find a way for the function to set gameFinished to true if and only if it runs pullQuestion without ever entering the if statement.
-                triviaGame.pullQuestion();
-            }
+                try {
+                    triviaGame.pullQuestion();
+                }
+                catch(error) {
+                    //this works. So what I will do is on the catch, go to the results screen.
+                    console.log(error);
+                }
+            };
         },
 
         checkAnswer: function (buttonPress) {
             if (buttonPress["innerText"] === triviaGame.Questions[qPulled].correctAnswer) {
                 console.log("correct!");
                 triviaGame.correct++;
-            } else {
+            }else {
                 console.log("incorrect!")
                 triviaGame.incorrect++;
-            }
+            };
         },
 
 
@@ -75,7 +81,7 @@ $(document).ready(function () {
     triviaGame.pullQuestion();
 
     //When answer is clicked
-    $("#answer > li").on("click", "button", function () {
+    $("#answer").on("click", "button", function () {
         triviaGame.checkAnswer(this);
         $("#b0").empty();
         $("#b1").empty();
