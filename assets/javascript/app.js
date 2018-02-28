@@ -24,20 +24,66 @@ $(document).ready(function () {
         displayAnswer: null,
         correct: 0,
         incorrect: 0,
+        gameFinished: false,
 
-        // Pull randomly from object full of questions and display that question
-        // Ideally want to display answers too, but want to get questions up and running first
+        // Pull randomly from object full of questions and display that question along with its possible answers
         pullQuestion: function () {
+            //Pull each possible question key into an array
             var questionKeys = Object.keys(triviaGame.Questions);
+            //randomly select one of those questions
             qPulled = questionKeys[Math.floor(Math.random() * questionKeys.length)];
-            displayQ = triviaGame.Questions[qPulled].question;
-            //So console log correctly logs displayQ. I cannot write it to the DOM for some reason
-            console.log(displayQ);
-            $("#question").text(displayQ);
-
+            //IF it has not been selected before, display the question and its answers, otherwise move to the else statement
+            if (triviaGame.Questions[qPulled].isPulled === false) {
+                displayQ = triviaGame.Questions[qPulled].question;
+                displayAnswer = triviaGame.Questions[qPulled].answers
+                $("#question").html("<p> " + displayQ + "</p>");
+                for (var i = 0; i < displayAnswer.length; i++) {
+                    $("#b" + i).html(displayAnswer[i]);
+                }
+                //This hides unused question slots
+                $(".button").each(function() {
+                    if ($(this).html().length === 0) {
+                        $(this).css("visibility", "hidden")
+                    } else {
+                        $(this).css("visibility", "visible")
+                    }
+                });
+                triviaGame.Questions[qPulled].isPulled = true;
+            } else if (triviaGame.gameFinished === true) {
+                //display a winning screen
+            } else {
+                //So this kinda works. pullQuestion breaks if there are no more unpulled questions, then I could throw an exception clause that moves to the game results screen
+                //Otherwise, need to find a way for the function to set gameFinished to true if and only if it runs pullQuestion without ever entering the if statement.
+                triviaGame.pullQuestion();
+            }
         },
+
+        checkAnswer: function (buttonPress) {
+            if (buttonPress["innerText"] === triviaGame.Questions[qPulled].correctAnswer) {
+                console.log("correct!");
+                triviaGame.correct++;
+            } else {
+                console.log("incorrect!")
+                triviaGame.incorrect++;
+            }
+        },
+
+
+
     };
+
     triviaGame.pullQuestion();
+
+    //When answer is clicked
+    $("#answer > li").on("click", "button", function () {
+        triviaGame.checkAnswer(this);
+        $("#b0").empty();
+        $("#b1").empty();
+        $("#b2").empty();
+        $("#b3").empty();
+        //setTimeout(triviaGame.pullQuestion, 3000);
+        triviaGame.pullQuestion();
+    });
 
     //Be able to mark the question as pulled, so as to not repeat any
     //Start a timer when each question is pulled, which is the amount of time the user has to complete the question

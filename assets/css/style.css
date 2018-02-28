@@ -1,0 +1,12 @@
+li {
+    list-style: none;
+}
+
+button:hover {
+    background: red;
+}
+
+button {
+    border: none;
+    text-decoration: none;
+}
