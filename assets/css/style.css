@@ -1,12 +1,44 @@
+body {
+    background: url("../../assets/images/bg.jpg")
+}
+
 li {
     list-style: none;
 }
 
-button:hover {
+.qbutton:hover {
     background: red;
 }
 
-button {
+.qbutton {
     border: none;
     text-decoration: none;
+}
+
+.container {
+    background: peachpuff;
+    margin-top: 5%;
+}
+
+#game {
+    visibility: hidden;
+    width: 20%;
+    margin-left: 40%;
+    margin-top: 10%;
+}
+
+#questionPic {
+    margin-left: 34%;
+}
+
+#resetButton {
+    visibility: hidden;
+    width: 20%;
+    margin-left: 40%;
+}
+
+#startButton {
+    width: 20%;
+    margin-left: 40%;
+    margin-top: 10%;
 }

@@ -6,14 +6,14 @@ $(document).ready(function () {
     //Create an object where keys are questions, and those keys hold dictionaries with the question number key,
     //which holds the value for their question, answers, correctAnswer, and whether or not they've been used yet
     var triviaGame = {
-        Questions: {
-            Q1: {
+        questions: {
+            Q0: {
                 question: "What is the air speed velocity of an unladen swallow?",
                 answers: ["I don't know that!", "25mph", "25mps"],
                 correctAnswer: "I don't know that!",
                 isPulled: false,
             },
-            Q2: {
+            Q1: {
                 question: "The sun rises in the east and sets in the west",
                 answers: ["True", "False"],
                 correctAnswer: "True",
@@ -28,30 +28,36 @@ $(document).ready(function () {
         incorrect: 0,
         unanswered: 0,
         timer: 30,
+        showTimer: null,
 
         // Pull randomly from object full of questions and display that question along with its possible answers
         pullQuestion: function () {
+            $("#questionPic").empty()
+            $("#b0").empty();
+            $("#b1").empty();
+            $("#b2").empty();
+            $("#b3").empty();
             //Pull each possible question key into an array
-            var questionKeys = Object.keys(triviaGame.Questions);
+            var questionKeys = Object.keys(triviaGame.questions);
             //randomly select one of those questions
             qPulled = questionKeys[Math.floor(Math.random() * questionKeys.length)];
             //IF it has not been selected before, display the question and its answers, otherwise move to the else statement
-            if (triviaGame.Questions[qPulled].isPulled === false) {
-                displayQ = triviaGame.Questions[qPulled].question;
-                displayAnswer = triviaGame.Questions[qPulled].answers
+            if (triviaGame.questions[qPulled].isPulled === false) {
+                displayQ = triviaGame.questions[qPulled].question;
+                displayAnswer = triviaGame.questions[qPulled].answers
                 $("#question").html("<p> " + displayQ + "</p>");
                 for (var i = 0; i < displayAnswer.length; i++) {
                     $("#b" + i).html(displayAnswer[i]);
                 }
                 //This hides unused question slots
-                $(".button").each(function () {
+                $(".qbutton").each(function () {
                     if ($(this).html().length === 0) {
                         $(this).css("visibility", "hidden")
                     } else {
                         $(this).css("visibility", "visible")
                     }
                 });
-                triviaGame.Questions[qPulled].isPulled = true;
+                triviaGame.questions[qPulled].isPulled = true;
             } else {
                 //So this kinda works. pullQuestion breaks if there are no more unpulled questions, then I could throw an exception clause that moves to the game results screen
                 //Otherwise, need to find a way for the function to set gameFinished to true if and only if it runs pullQuestion without ever entering the if statement.
@@ -60,28 +66,39 @@ $(document).ready(function () {
                 }
                 catch (error) {
                     //this works. So what I will do is on the catch, go to the results screen.
-                    $("#question").html("All done, heres how you did!");
+                    //There is a very weird bug where if I answer none of the questions, the timer on the catch screen 
+                    //continues to count down.
+                    triviaGame.stopTimer();
+                    $("#question").html("All done, here is how you did!");
                     $("#b0").html("Correct Answers: " + triviaGame.correct);
                     $("#b1").html("Incorrect Answers: " + triviaGame.incorrect);
                     $("#b2").html("Unanswered: " + triviaGame.unanswered).css("visibility", "visible");
-                    $("#b3").css("visibility", "hidden")
+                    $("#b3").css("visibility", "hidden");
+                    $("#resetButton").css("visibility", "visible");
                 }
             };
         },
 
         checkAnswer: function (buttonPress) {
-            if (buttonPress["innerText"] === triviaGame.Questions[qPulled].correctAnswer) {
+            if (buttonPress["innerText"] === triviaGame.questions[qPulled].correctAnswer) {
                 console.log("correct!");
+                $("#questionPic").append("<img src=assets/images/rejoice.gif>")
                 triviaGame.correct++;
             } else {
                 console.log("incorrect!")
+                $("#questionPic").append("The correct answer was " + triviaGame.questions[qPulled].correctAnswer);
                 triviaGame.incorrect++;
             };
         },
 
         startTimer: function () {
             triviaGame.timer = 30;
-            setInterval(triviaGame.decrement, 1000);
+            triviaGame.stopTimer();
+            triviaGame.showTimer = setInterval(triviaGame.decrement, 1000);
+        },
+
+        stopTimer: function () {
+            clearInterval(triviaGame.showTimer);
         },
 
         decrement: function () {
@@ -89,44 +106,44 @@ $(document).ready(function () {
             $("#timer").html("Time Remaining: " + triviaGame.timer + " seconds.")
             if (triviaGame.timer === 0) {
                 triviaGame.unanswered++;
-                triviaGame.pullQuestion();
-                clearInterval(triviaGame.decrement);
-                triviaGame.startTimer();
+                $("#questionPic").append("Time's up! The correct answer was " + triviaGame.questions[qPulled].correctAnswer);
+                setTimeout(triviaGame.startTimer, 3000);
+                setTimeout(triviaGame.pullQuestion, 3000);
             };
-        }
+        },
 
         //also need a resetfunction, which sets all questions to unpulled, sets counters to 0, and pulls another question
-
+        reset: function () {
+            for (var i = 0; i < Object.keys(triviaGame.questions).length; i++) {
+                triviaGame.questions["Q" + i].isPulled = false;
+            };
+            qPulled = null;
+            displayQ = null;
+            displayAnswer = null;
+            triviaGame.correct = 0;
+            triviaGame.incorrect = 0;
+            triviaGame.unanswered = 0;
+            triviaGame.startTimer();
+            triviaGame.pullQuestion();
+            $("#resetButton").css("visibility", "hidden");
+        },
     };
 
-    //these are just placeholders for the startgame button
-    triviaGame.startTimer();
-    triviaGame.pullQuestion();
+    $("#startButton").on("click", function () {
+        $("#start").empty();
+        triviaGame.startTimer();
+        triviaGame.pullQuestion();
+        $("#game").css("visibility", "visible")
+    });
 
     //When answer is clicked
     $("#answer").on("click", "button", function () {
         triviaGame.checkAnswer(this);
-        $("#b0").empty();
-        $("#b1").empty();
-        $("#b2").empty();
-        $("#b3").empty();
-        clearInterval(triviaGame.startTimer);
         setTimeout(triviaGame.startTimer, 3000);
         setTimeout(triviaGame.pullQuestion, 3000);
     });
 
-    //Be able to mark the question as pulled, so as to not repeat any
-    //Start a timer when each question is pulled, which is the amount of time the user has to complete the question
-
-    //2) Take user clicks on the respective answers and match them against the correct answers
-    //If correct, then show a screen congratulating them for the right option. 
-    //Delay a few seconds, then display next Question without user prompt
-    //If incorrect, inform the player they were wrong, display the correct answer, 
-    //Then delay a few seconds and display next question without user prompt
-    //If timeout, inform the player time is up and display the correct answer,
-    //then delay a few seconds and display next question without user prompt
-
-    //3 Once all questions have been iterated through, display a final screen showing:
-    //number of correct answers, incorrect answers, and an option to restart the game
-
+    $("#resetButton").on("click", function () {
+        triviaGame.reset();
+    });
 });

@@ -22,28 +22,48 @@
 
 <body>
     <div class="container">
-        <div class="row">
+
+        <div class="row" id="start">
+            <div class="col-lg-12">
+                <button class="button" id="startButton">Start</button>
+            </div>
+        </div>
+
+        <div class="row" id="game">
             <div class="col-lg-12">
                 <div id="timer"></div>
                 <div id="question"></div>
                 <div>
                     <ul id="answer">
                         <li>
-                            <button class="button" id="b0"></button>
+                            <button class="qbutton" id="b0"></button>
                         </li>
                         <ld>
-                            <button class="button" id="b1"></button>
+                            <button class="qbutton" id="b1"></button>
                             </li>
                             <li>
-                                <button class="button" id="b2"></button>
+                                <button class="qbutton" id="b2"></button>
                             </li>
                             <li>
-                                <button class="button" id="b3"></button>
+                                <button class="qbutton" id="b3"></button>
                             </li>
                     </ul>
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="questionPic"></div>
+            </div>
+        </div>
+
+        <div class="row" id="reset">
+            <div class="col-lg-12">
+                <button class="button" id="resetButton">Start Over?</button>
+            </div>
+        </div>
+
     </div>
 </body>
 
