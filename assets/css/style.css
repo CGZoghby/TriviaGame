@@ -1,9 +1,18 @@
+@font-face {
+    font-family: "Aclonica";
+    src: url('https://fonts.googleapis.com/css?family=Aclonica');
+}
+
 body {
     background: url("../../assets/images/bg.jpg")
 }
 
 li {
     list-style: none;
+}
+
+.header {
+    font-family: "Aclonica"
 }
 
 .qbutton:hover {

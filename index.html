@@ -22,15 +22,18 @@
 
 <body>
     <div class="container">
-
+        <!-- The start button, which displays only once, on first website load. Resetting the game just brings up another round of questions -->
         <div class="row" id="start">
             <div class="col-lg-12">
                 <button class="button" id="startButton">Start</button>
             </div>
         </div>
-
+        <!-- The game div where the full game displays -->
         <div class="row" id="game">
             <div class="col-lg-12">
+                <div class="header">
+                    <h1>Monty Python and the Holy Grail Trivia!!</h1>
+                </div>
                 <div id="timer"></div>
                 <div id="question"></div>
                 <div>
@@ -51,13 +54,13 @@
                 </div>
             </div>
         </div>
-
+        <!-- The response to the question, either Time's Up, or correct, or incorrect, is linked to in here -->
         <div class="row">
             <div class="col-lg-12">
                 <div id="questionPic"></div>
             </div>
         </div>
-
+        <!-- At game end, display this reset button -->
         <div class="row" id="reset">
             <div class="col-lg-12">
                 <button class="button" id="resetButton">Start Over?</button>

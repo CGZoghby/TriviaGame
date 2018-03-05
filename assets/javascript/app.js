@@ -1,7 +1,4 @@
 $(document).ready(function () {
-
-    //currently have an issue with multiple time instances
-
     //Doing this with a game object. Trying to use objects to get better practice because they still don't make sense
     //Create an object where keys are questions, and those keys hold dictionaries with the question number key,
     //which holds the value for their question, answers, correctAnswer, and whether or not they've been used yet
@@ -14,13 +11,61 @@ $(document).ready(function () {
                 isPulled: false,
             },
             Q1: {
-                question: "The sun rises in the east and sets in the west",
-                answers: ["True", "False"],
-                correctAnswer: "True",
+                question: "The name of the enchanter with goat horns is...",
+                answers: ["Fred", "George", "Ceasar", "Tim"],
+                correctAnswer: "Tim",
                 isPulled: false,
             },
+            Q2: {
+                question: "What was King Arthur banging together to imitate the sounds of a horse?",
+                answers: ["Mangos", "Skulls", "Horseshoes", "Coconuts"],
+                correctAnswer: "Coconuts",
+                isPulled: false,
+            },
+            Q3: {
+                question: "What did the peasant claim the 'witch' turned him into?",
+                answers: ["A cockroach", "A newt", "A rabbit", "An insect"],
+                correctAnswer: "A newt",
+                isPulled: false,
+            },
+            Q4: {
+                question: "How many limbs did the black knight lose before he declared his duel between King Arthur 'a draw?'",
+                answers: ["1", "2", "3", "4"],
+                correctAnswer: "4",
+                isPulled: false,
+            },
+            Q5: {
+                question: "For how many seconds should you count after pulling the pin from the Holy Hand Grenade, before you throw it?",
+                answers: ["2", "3", "4", "It's a grenade, pull the pin and throw it and run!"],
+                correctAnswer: "3",
+                isPulled: false,
+            },
+            Q6: {
+                question: "Which country taunted King Arthur and his companions from atop their castle?",
+                answers: ["The French", "The Spanish", "The Danes", "The Swedes"],
+                correctAnswer: "The French",
+                isPulled: false,
+            },
+            Q7: {
+                question: "The Knights who say Ni demand a...?",
+                answers: ["prisoner", "rabbit", "witch", "shrubbery"],
+                correctAnswer: "shrubbery",
+                isPulled: false,
+            },
+            Q8: {
+                question: "Those found at fault during the opening credit were...",
+                answers: ["fined", "bagged", "sacked", "promoted"],
+                correctAnswer: "sacked",
+                isPulled: false,
+            },
+            Q9: {
+                question: "How does the movie end?",
+                answers: ["They are arrested by the 70s British police", "they find the grail", "there is an epic battle"],
+                correctAnswer: "They are arrested by the 70s British police",
+                isPulled: false,
+            }
         },
-
+        //Define variables to be used in the methods declared below
         qPulled: null,
         displayQ: null,
         displayAnswer: null,
@@ -32,6 +77,7 @@ $(document).ready(function () {
 
         // Pull randomly from object full of questions and display that question along with its possible answers
         pullQuestion: function () {
+            //Additionally, need to empty any response pictures, and the question slots (this javascript can handle true/false and multiple choice because of this)
             $("#questionPic").empty()
             $("#b0").empty();
             $("#b1").empty();
@@ -49,7 +95,7 @@ $(document).ready(function () {
                 for (var i = 0; i < displayAnswer.length; i++) {
                     $("#b" + i).html(displayAnswer[i]);
                 }
-                //This hides unused question slots
+                //This hides unused question slots, builds in compatibility for true/false questions (I was testing with those because they were easier to write haha)
                 $(".qbutton").each(function () {
                     if ($(this).html().length === 0) {
                         $(this).css("visibility", "hidden")
@@ -60,14 +106,13 @@ $(document).ready(function () {
                 triviaGame.questions[qPulled].isPulled = true;
             } else {
                 //So this kinda works. pullQuestion breaks if there are no more unpulled questions, then I could throw an exception clause that moves to the game results screen
-                //Otherwise, need to find a way for the function to set gameFinished to true if and only if it runs pullQuestion without ever entering the if statement.
+                //Otherwise, need to find a way for the function to set a variable gameFinished to true if and only if it runs pullQuestion without ever entering the if statement.
                 try {
+                    //The error that this try-catch block hangs on is that pullQuestion will start infinitely looping
                     triviaGame.pullQuestion();
                 }
                 catch (error) {
                     //this works. So what I will do is on the catch, go to the results screen.
-                    //There is a very weird bug where if I answer none of the questions, the timer on the catch screen 
-                    //continues to count down.
                     triviaGame.stopTimer();
                     $("#question").html("All done, here is how you did!");
                     $("#b0").html("Correct Answers: " + triviaGame.correct);
@@ -79,6 +124,7 @@ $(document).ready(function () {
             };
         },
 
+        //Method for checking clicked answer against possible answers.
         checkAnswer: function (buttonPress) {
             if (buttonPress["innerText"] === triviaGame.questions[qPulled].correctAnswer) {
                 console.log("correct!");
@@ -91,6 +137,7 @@ $(document).ready(function () {
             };
         },
 
+        //startTime, stopTimer, and decrement all hinge around timer display, and what to do with timing out on questions
         startTimer: function () {
             triviaGame.timer = 30;
             triviaGame.stopTimer();
@@ -128,7 +175,8 @@ $(document).ready(function () {
             $("#resetButton").css("visibility", "hidden");
         },
     };
-
+    //Only click this button once then I make the start button disappear! Better to empty, instead of render invisible, because allowed for more display space for the reaction gif and
+    //questions
     $("#startButton").on("click", function () {
         $("#start").empty();
         triviaGame.startTimer();
@@ -143,6 +191,7 @@ $(document).ready(function () {
         setTimeout(triviaGame.pullQuestion, 3000);
     });
 
+    //This will only display on game completion
     $("#resetButton").on("click", function () {
         triviaGame.reset();
     });
